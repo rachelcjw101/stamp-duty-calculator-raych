@@ -1,0 +1,289 @@
+// Verbatim statutory text shown in the § panel.
+// Each "q" segment is copied from the source text and checked by verify-provisions.js.
+// "tbl" segments are table cells transcribed from the printed page and checked by eye.
+// "note" is editorial and is always shown labelled as such.
+const PROVISIONS = {
+  "s2-residential": {
+    title: "Stamp Act 1949, section 2",
+    sub: "Definition of “residential property”",
+    src: "act",
+    body: [
+      { q: "“residential property” means a house, condominium, apartment, flat, service apartment or small office home office solely to be used as a dwelling house;" },
+      { label: "Inserted by Finance Act 2025 [Act 874], s 26, in force 1 January 2026", src: "fa2025", q: "26. The Stamp Act 1949, which is referred to as the “principal Act” in this Chapter, is amended in section 2 by inserting after the definition of “property” the following definition:" },
+    ],
+  },
+  "s36CB": {
+    title: "Stamp Act 1949, section 36CB",
+    sub: "Minimum amount of duty",
+    src: "act",
+    body: [
+      { q: "36CB. Notwithstanding any other provision of this Act, an amount of ten ringgit shall be imposed as duty for each instrument where the duty is less than ten ringgit except for cheque and contract note." },
+    ],
+  },
+  "s47A": {
+    title: "Stamp Act 1949, section 47A",
+    sub: "Penalty for late stamping",
+    src: "act",
+    body: [
+      { label: "Subsection (1) as substituted by Finance Act 2024 [Act 862], s 26, in force 1 January 2025", src: "fa2024", q: "(1) An instrument which is not stamped within the period specified in or under section 40, 43 or 47 may be stamped on payment of the unpaid duty and a penalty of—" },
+      { src: "fa2024", q: "(a) fifty ringgit or ten per centum of the amount of the deficient duty, whichever sum be the greater, if the instrument is stamped within three months after the time for stamping; or" },
+      { src: "fa2024", q: "(b) one hundred ringgit or twenty per centum of the amount of the deficient duty, whichever sum be the greater, in any other case." },
+      { label: "Subsection (2), AGC updated text", q: "(2) The Collector may, if he thinks fit, reduce or remit such penalty or the further amount payable under subsection 9(3)." },
+      { note: "The AGC updated text as at 1 January 2026 still reads “subsection 36(2), section 40, 43 or 47” in subsection (1). Finance Act 2024 removed the reference to subsection 36(2), so the Finance Act text is quoted here." },
+    ],
+  },
+  "s20A": {
+    title: "Stamp Act 1949, section 20A(2)",
+    sub: "Exchange or partition of real property without consideration",
+    src: "act",
+    body: [
+      { q: "(2) Notwithstanding subsection (1), where an instrument is chargeable with a duty in respect of an exchange of any real property for any real property or upon the partition or division of any real property, and no consideration is paid or given, or agreed to be paid or given, the instrument shall be chargeable with the duty of ten ringgit only if—" },
+      { q: "(a) in such partition or division both transferor and transferee are the original owners of the real property;" },
+      { q: "(b) such exchange of real property is between any person and a Ruler of a State or the Government of Malaysia or of any State; or" },
+      { q: "(c) such exchange of real property is between husband and wife, parent and child, grandparent and grandchild or among siblings." },
+      { label: "Inserted by Finance Act 2024 [Act 862], s 24(c), in force 1 January 2025", src: "fa2024", q: "(c) by inserting after the renumbered subsection (1) the following subsection:" },
+    ],
+  },
+  "item4": {
+    title: "Stamp Act 1949, First Schedule, item 4",
+    sub: "Agreement or memorandum of agreement, with exemption (b)",
+    src: "act",
+    body: [
+      { tbl: "4. AGREEMENT OR MEMORANDUM OF AGREEMENT made under hand only, and not otherwise specially charged with any duty, whether the same is only evidence of a contract or obligatory on the parties from its being a written instrument." },
+      { label: "Proper stamp duty", q: "RM10.00" },
+      { label: "Exemptions", q: "(b) for service or personal employment where the wages do not exceed RM3,000 per month, and any agreement between the master and mariners of any vessel or boat for wages;" },
+      { label: "Finance Act 2025 [Act 874], s 29(a), in force 1 January 2026", src: "fa2025", q: "in relation to item 4, in the column “Description of Instrument”, under “Exemptions”, in paragraph (b), by substituting for the words “RM300 per month” the words “RM3,000 per month”; and" },
+    ],
+  },
+  "item22-1a": {
+    title: "Stamp Act 1949, First Schedule, item 22(1)(a)",
+    sub: "Bond, covenant, loan, services: principal security",
+    src: "act",
+    body: [
+      { q: "22. BOND, COVENANT, LOAN, SERVICES, EQUIPMENT LEASE AGREEMENT OR INSTRUMENT of any kind whatsoever:" },
+      { q: "(1) Being the only or principal or primary security for any annuity (except upon the original creation thereof by way of sale or security, and except a superannuation annuity), or for any sum or sums of money at stated periods, not being interest for any sum secured by a duly stamped instrument, nor rent reserved by a lease or tack—" },
+      { tbl: "(a) for a definite and certain period so that the total amount to be ultimately payable can be ascertained" },
+      { label: "Proper stamp duty", tbl: "The same ad valorem duty as a charge or mortgage for such total amount." },
+    ],
+  },
+  "item22-6": {
+    title: "Stamp Act 1949, First Schedule, item 22(6)",
+    sub: "Security for financing the purchase of goods",
+    src: "act",
+    body: [
+      { tbl: "(6) Being the security for securing the payment or repayment of money for the purchase of goods (within the meaning given under the First Schedule of the Hire-Purchase Act 1967) in accordance with any Syariah principles or conventional hire purchase." },
+      { label: "Proper stamp duty", q: "RM10.00" },
+    ],
+  },
+  "item27a": {
+    title: "Stamp Act 1949, First Schedule, item 27(a)",
+    sub: "Charge or mortgage: principal security for payment or repayment of money",
+    src: "act",
+    body: [
+      { q: "27. CHARGE OR MORTGAGE, AGREEMENT FOR A CHARGE OR MORTGAGE (including that under the Syariah), BOND, COVENANT, DEBENTURE (not being a marketable security), BILL OF SALE by way of security and WARRANT OF ATTORNEY to confess and enter up judgment:" },
+      { q: "(a) Being the only or principal or primary security (other than an equitable mortgage or an assignment of receivables or the kind mentioned in paragraph (d)) for the payment or repayment of money—" },
+      { q: "(i) where the loan is to a small and medium enterprise or financing is provided to a small and medium enterprise according to the Syariah—" },
+      { tbl: "For an amount not exceeding RM250,000 of the aggregate loans or of the aggregate financing under the syariah in a calendar year: RM0.50 for every RM1,000 or fractional thereof" },
+      { tbl: "For each additional RM1,000 not exceeding RM1,000,000: RM2.50 for every RM1,000 or fractional thereof" },
+      { tbl: "For each additional RM1,000 or part thereof: RM5.00" },
+      { tbl: "(ii) where the loans is a foreign currency loan or the financing was made according to the syariah in currencies other than the ringgit" },
+      { label: "Proper stamp duty", tbl: "RM5.00 for every RM1,000 or part thereof" },
+      { q: "(iii) in any other case—" },
+      { tbl: "For each RM1,000 or part thereof: RM5.00" },
+    ],
+  },
+  "item32a": {
+    title: "Stamp Act 1949, First Schedule, item 32(a)",
+    sub: "Conveyance on sale: ad valorem scale",
+    src: "act",
+    body: [
+      { q: "32. CONVEYANCE, ASSIGNMENT, TRANSFER OR ABSOLUTE BILL OF SALE:" },
+      { tbl: "(a) On sale of any property (except stock, shares, marketable securities and accounts receivables or book debts of the kind mentioned in paragraph (c))" },
+      { label: "Proper stamp duty", tbl: "For every RM100 or fractional part of RM100 of the amount of the money value of the consideration or the market value of the property, whichever is the greater— (i) RM1.00 on the first RM100,000; (ii) RM2.00 on any amount in excess of RM100,000 but not exceeding RM500,000; (iii) RM3.00 on any amount in excess of RM500,000 but not exceeding RM1,000,000; (iv) RM4.00 on any amount in excess of RM1,000,000." },
+    ],
+  },
+  "item32aa": {
+    title: "Stamp Act 1949, First Schedule, item 32(aa)",
+    sub: "Conveyance on sale to a foreign company or non-citizen non-PR (non-residential)",
+    src: "act",
+    body: [
+      { tbl: "(aa) On sale of any property (except residential property, stock, shares, marketable securities and accounts receivables or book debts of the kind mentioned in paragraph (c)) to a foreign company or a person who is not a citizen and not a permanent resident" },
+      { label: "Proper stamp duty", tbl: "RM4.00 for every RM100 or fractional part of RM100 of the amount of the money value of the consideration or the market value of the property, whichever is the greater." },
+      { label: "Finance Act 2025 [Act 874], s 29(b)(i), in force 1 January 2026", src: "fa2025", q: "in paragraph (aa), by substituting for the words “except stock,” the words “except residential property, stock,”;" },
+    ],
+  },
+  "item32ab": {
+    title: "Stamp Act 1949, First Schedule, item 32(ab)",
+    sub: "Conveyance on sale of residential property to a foreign company or non-citizen non-PR",
+    src: "act",
+    body: [
+      { tbl: "(ab) On sale of any residential property from 1 January 2026 to a foreign company or a person who is not a citizen and not a permanent resident" },
+      { label: "Proper stamp duty", tbl: "RM8.00 for every RM100.00 or fractional part of RM100.00 of the amount of the money value of the consideration or the market value of the residential property, whichever is the greater" },
+      { label: "Inserted by Finance Act 2025 [Act 874], s 29(b)(ii), in force 1 January 2026", src: "fa2025", q: "by inserting after paragraph (aa) and the particulars relating to it the following paragraph and particulars:" },
+    ],
+  },
+  "item32b": {
+    title: "Stamp Act 1949, First Schedule, item 32(b)",
+    sub: "Conveyance on sale of stock, shares or marketable securities",
+    src: "act",
+    body: [
+      { tbl: "(b) On sale of any stock, shares or marketable securities, to be computed on the price or value thereof on the date of transfer, whichever is the greater—" },
+      { q: "For every RM1,000 or fractional part of RM1,000" },
+      { label: "Proper stamp duty", q: "RM3.00" },
+    ],
+  },
+  "item32h": {
+    title: "Stamp Act 1949, First Schedule, item 32(h)",
+    sub: "Gift; release or renunciation within a deceased estate",
+    src: "act",
+    body: [
+      { q: "(h) Of any property—" },
+      { tbl: "(i) by way of gift (whether by way of voluntary disposition or otherwise): See Gift and subsection 16(1)" },
+      { tbl: "(ii) by way of release or renunciation by a beneficiary of a deceased estate to another beneficiary entitled under the same estate: RM10.00" },
+    ],
+  },
+  "item49a": {
+    title: "Stamp Act 1949, First Schedule, item 49(a)",
+    sub: "Lease or agreement for lease of immovable property",
+    src: "act",
+    body: [
+      { q: "49. LEASE OR AGREEMENT FOR LEASE of any immovable property and for securing the payment for the provision of services or facilities or to other matters or things in connection with such lease:" },
+      { tbl: "(a) Without fine or premium when the average rent and other considerations calculated for a whole year—" },
+      { label: "Proper stamp duty", tbl: "For every RM250.00 or part thereof, when the lease is for a period— Not exceeding one year: RM1.00. Exceeding one but not exceeding three years: RM3.00. Exceeding three years but not exceeding five years: RM5.00. Exceeding five years or for any indefinite period: RM7.00." },
+      { label: "Finance Act 2024 [Act 862], s 27(e)(i), in force 1 January 2025", src: "fa2024", q: "(e) in item 49—" },
+      { src: "fa2024", q: "(i) by substituting for subitem (a) and the particulars relating to it the following subitem and particulars:" },
+      { note: "Finance Act 2024 replaced subitem (a) together with its particulars, so the old rows “Does not exceed RM2,400 — Nil” and “in excess of RM2,400” no longer apply. The AGC updated text still prints those rows under the new rates; they are left over from the earlier version." },
+    ],
+  },
+  "pua53": {
+    title: "Stamp Duty (Exemption) Order 2021",
+    sub: "P.U. (A) 53/2021, gazetted 10 February 2021, para 2; as amended by P.U. (A) 448/2025",
+    src: "pua53",
+    body: [
+      { q: "2. (1) The Minister exempts all instrument of transfer for the purchase of only one unit of residential property the value of which is not more than five hundred thousand ringgit (RM500,000.00) executed by an individual from stamp duty if—" },
+      { q: "(a) the sale and purchase agreement for the purchase of the residential property is executed on or after 1 January 2021 but not later than 31 December 2025; and" },
+      { q: "(b) the individual has never owned any residential property including a residential property which is obtained by way of inheritance or gift, which is held either individually or jointly." },
+      { q: "(2) For the purpose of subparagraph (1), the value of the residential property shall be based on the market value." },
+      { q: "(b) “individual” means a purchaser of a residential property who is a Malaysian citizen or co-purchaser of a residential property who is a Malaysian citizen." },
+      { label: "P.U. (A) 448/2025, gazetted 23 December 2025, in force 1 January 2026", src: "pua448", q: "2. The Stamp Duty (Exemption) Order 2021 [P.U. (A) 53/2021] is amended in subsubparagraph 2(1)(a) by substituting for the words “31 December 2025” the words “31 December 2027”." },
+      { note: "Para 2(3) also requires a statutory declaration by the purchaser that they have never owned a residential property." },
+    ],
+  },
+  "pua54": {
+    title: "Stamp Duty (Exemption) (No. 2) Order 2021",
+    sub: "P.U. (A) 54/2021, gazetted 10 February 2021, para 2; as amended by P.U. (A) 449/2025",
+    src: "pua53",
+    body: [
+      { q: "2. (1) The Minister exempts from stamp duty any loan agreement to finance the purchase of only one unit of residential property the value of which is not more than five hundred thousand ringgit (RM500,000.00) executed between an individual named in the sale and purchase agreement and—" },
+      { q: "(2) The stamp duty exemption under subparagraph (1) shall only apply if—" },
+      { q: "(a) the sale and purchase agreement for the purchase of the residential property is executed on or after 1 January 2021 but not later than 31 December 2025; and" },
+      { label: "P.U. (A) 449/2025, gazetted 23 December 2025, in force 1 January 2026", src: "pua449", q: "2. The Stamp Duty (Exemption) (No. 2) Order 2021 [P.U. (A) 54/2021] is amended in subsubparagraph 2(2)(a) by substituting for the words “31 December 2025” the words “31 December 2027”." },
+      { note: "Para 2(1)(a) to (i) lists the lenders covered: licensed banks and Islamic banks, development financial institutions, licensed insurers and takaful operators, co-operative societies, employer housing loan schemes, Borneo Housing Mortgage Finance Berhad and Mutiara Mortgage and Credit Sdn Bhd." },
+    ],
+  },
+  "pua178": {
+    title: "Stamp Duty (Exemption) (No. 3) Order 2023",
+    sub: "P.U. (A) 178/2023, gazetted 9 June 2023, in force 1 April 2023, para 2 and Schedule",
+    src: "pua178",
+    body: [
+      { q: "2. (1) The Minister exempts stamp duty in respect of all instruments of transfer of any immovable property operating as a voluntary disposition inter vivos from the donor specified in column (2) of the Schedule to the recipient specified in column (3) of the Schedule." },
+      { q: "(2) The exemption of stamp duty referred to in subparagraph (1) shall be limited to the stamp duty that should be imposed for the first one million ringgit or less from the value of the immovable property and fifty per centum of the stamp duty chargeable on an amount in excess of one million ringgit shall be imposed on the balance amount of the value of the immovable property which is more than one million ringgit." },
+      { q: "(3) The exemption of stamp duty under subparagraph (1) shall only apply if—" },
+      { q: "(a) the instrument of transfer of the immovable property is executed on or after 1 April 2023; and" },
+      { q: "(b) the recipient is a Malaysian citizen." },
+      { q: "(4) For the purposes of subparagraph (2), the value of the immovable property shall be based on market value." },
+      { label: "Schedule", tbl: "Mother or father, or both → child; child → mother or father, or both; grandfather or grandmother, or both → grandchild; grandchild → grandfather or grandmother, or both." },
+      { q: "In this Schedule, “child” means a legitimate child, a step child or child adopted in accordance with any law." },
+    ],
+  },
+  "pua420": {
+    title: "Perintah Duti Setem (Pengecualian) (No. 10) 2007",
+    sub: "P.U. (A) 420/2007, gazetted 17 December 2007, in force 8 September 2007. Gazetted in Bahasa Malaysia only.",
+    src: "pua420",
+    body: [
+      { q: "2. Semua surat cara yang menguatkuasakan pindah milik ke atas mana-mana harta tak alih yang merupakan pelupusan sukarela inter vivos daripada pemberi yang dinyatakan dalam ruang (1) Jadual kepada penerima yang dinyatakan dalam ruang (2) adalah dikecualikan daripada duti setem." },
+      { label: "Jadual", tbl: "Pemberi: Suami → Penerima: Isteri. Pemberi: Isteri → Penerima: Suami." },
+      { note: "Text from an OCR of the gazette scan. Compare with the PDF before quoting it in advice." },
+    ],
+  },
+  "pua428": {
+    title: "Stamp Duty (Remission) Order 2021",
+    sub: "P.U. (A) 428/2021, gazetted 25 November 2021, deemed in force 28 December 2018, para 2",
+    src: "pua428",
+    body: [
+      { q: "2. (1) The amount of stamp duty that is chargeable under subsubitem 22(1)(a) of the First Schedule to the Act which is in excess of zero point one per center (0.1%) of any or sums of money in relation to any instrument of service agreement chargeable of duty under that subsubitem executed on or after 28 December 2018 is remitted." },
+      { q: "(2) For the purpose of subparagraph (1), the instrument of service agreement shall be an agreement executed by—" },
+      { q: "(a) a main service provider with a person other than a Ruler of a State or the Government of Malaysia or of any State or local authority awarding the undertaking; or" },
+      { q: "(b) a sub-provider of service with the main service provider where the main service provider has entered into an undertaking with a Ruler of a State or the Government of Malaysia or of any State or local authority awarding the undertaking." },
+      { q: "(3) Notwithstanding subparagraphs (1) and (2), where the main service provider under subsubparagraph 2(a) or the sub-provider of service under subsubparagraph (2)(b) further executes an instrument of service agreement with another sub-provider of service and so on, the amount of stamp duty that is chargeable upon that instrument under subsubitem 22(1)(a) of the First Schedule to the Act which is in excess of RM50.00 is remitted." },
+      { note: "“per center” and “any or sums of money” are as printed in the gazette." },
+    ],
+  },
+  "pua258": {
+    title: "Stamp Duty (Remission) (No. 2) Order 2012",
+    sub: "P.U. (A) 258/2012, made 25 July 2012, para 2",
+    src: "pua258",
+    body: [
+      { q: "2. The amount of stamp duty that is chargeable under subsubitem 22(1)(b) of the First Schedule to the Act upon a loan agreement or loan instrument without security for any sum or sums of money repayable on demand or in single bullet repayment under that subsubitem which is in excess of zero point one per cent (0.1%) is remitted." },
+      { note: "Text from an OCR of the gazette scan. The order refers to item 22(1)(b), which in the current Schedule covers annuities for life or an indefinite period. Loans and services moved to item 22(1)(a) in 2018, and P.U. (A) 428/2021 was made to follow that move for service agreements. No equivalent update for this order was uploaded, so confirm how LHDN applies it before relying on the 0.1% rate." },
+    ],
+  },
+  "budget27-home": {
+    title: "Budget 2027 Tax Measures, Appendix 16",
+    sub: "Proposal: review of stamp duty exemption for the purchase of first residential home. Not yet law.",
+    src: "budget",
+    proposal: true,
+    body: [
+      { q: "ii. Homes priced up to RM750,000" },
+      { q: "Stamp duty exemption be given on loan agreements and instruments of transfer as follows:" },
+      { q: "a. 100% exemption on the first RM500,000 of the home price; and" },
+      { q: "b. 50% exemption on the remaining home price exceeding RM500,000 up to RM750,000." },
+      { label: "Effective date", q: "For loan agreements and instruments of transfer involving sale and purchase agreements executed from 1 January 2027 until 31 December 2030." },
+      { note: "The proposal does not say how the 50% applies to a loan agreement. This calculator applies it to the share of the loan matching the price above RM500,000." },
+    ],
+  },
+  "budget27-fx": {
+    title: "Budget 2027 Tax Measures, Appendix 19",
+    sub: "Proposal: stamp duty on foreign currency loan or financing agreements. Not yet law.",
+    src: "budget",
+    proposal: true,
+    body: [
+      { q: "To enhance access to domestic financing, it is proposed that the maximum limit of stamp duty imposed on loan or financing agreements in foreign currency from banks in Malaysia be determined as follows:" },
+      { q: "i. RM2,000 for loan or financing up to RM100 million; and" },
+      { q: "ii. RM5,000 for loan or financing exceeding RM100 million." },
+      { label: "Effective date", q: "For loan or financing agreements executed from 1 January 2027." },
+    ],
+  },
+  "budget27-cakna": {
+    title: "Budget 2027 Tax Measures, Appendix 20 (current position)",
+    sub: "CAKNA scheme. The remission order itself was not uploaded.",
+    src: "budget",
+    unverified: true,
+    body: [
+      { q: "Remission is given on stamp duty exceeding RM10 for the principal loan or financing agreements as follows:" },
+      { q: "CAKNA I : Agreements executed from 1 March 2021 until 31 December 2028." },
+      { note: "This is the Ministry of Finance's description, not the gazetted remission order." },
+    ],
+  },
+  "unverified": {
+    title: "Text not yet verified",
+    sub: "",
+    unverified: true,
+    body: [{ note: "The gazetted text for this rule has not been checked yet, so no quote is shown." }],
+  },
+};
+const SOURCES = {
+  act: "Stamp Act 1949 [Act 378], AGC online updated text as at 1 January 2026 (latest amendment by Act 875). Not an authentic text under the Revision of Laws Act 1968.",
+  pua53: "Federal Government Gazette, 10 February 2021",
+  pua448: "Federal Government Gazette, 23 December 2025",
+  pua449: "Federal Government Gazette, 23 December 2025",
+  pua178: "Federal Government Gazette, 9 June 2023",
+  pua420: "Warta Kerajaan, 17 December 2007",
+  pua428: "Federal Government Gazette, 25 November 2021",
+  pua258: "Federal Government Gazette, 2012",
+  fa2024: "Finance Act 2024 [Act 862], Royal Assent 24 December 2024, gazetted 31 December 2024",
+  fa2025: "Finance Act 2025 [Act 874], Royal Assent 27 December 2025, gazetted 31 December 2025",
+  budget: "Ministry of Finance, Budget 2027 tax measures (appendices)",
+};
+const CHECKED_ON = "10 November 2026";
+if (typeof module !== "undefined") module.exports = { PROVISIONS, SOURCES };

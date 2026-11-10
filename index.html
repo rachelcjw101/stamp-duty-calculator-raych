@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Free Malaysian stamp duty calculator under the Stamp Act 1949, with the exact text of each provision and exemption order.">
+<title>Malaysia Stamp Duty Calculator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: masthead, instrument tabs, then a form column beside a sticky "revenue stamp" result column; stacks to one column on phones. */
+:root {
+  --paper: #eef1f2;
+  --sheet: #ffffff;
+  --ink: #182433;
+  --muted: #566476;
+  --line: #d3dae0;
+  --field: #f7f9fa;
+  --stamp: #a3243b;
+  --stamp-soft: #f6e6e9;
+  --ok: #1f6b4a;
+  --warn: #8a5a00;
+  --warn-soft: #fbf1dc;
+  --prop: #3c4fa0;
+  --prop-soft: #e8ebf7;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #10161d; --sheet: #17202a; --ink: #e5eaef; --muted: #9aa7b5; --line: #2b3642; --field: #1d2833;
+  --stamp: #f07a8e; --stamp-soft: #3a1e25; --ok: #6cc79c; --warn: #e8b85a; --warn-soft: #33290f; --prop: #9fb0f2; --prop-soft: #212a4a;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #10161d; --sheet: #17202a; --ink: #e5eaef; --muted: #9aa7b5; --line: #2b3642; --field: #1d2833;
+  --stamp: #f07a8e; --stamp-soft: #3a1e25; --ok: #6cc79c; --warn: #e8b85a; --warn-soft: #33290f; --prop: #9fb0f2; --prop-soft: #212a4a;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 15px/1.55 var(--body); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: end; justify-content: space-between; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--stamp); }
+h1 { font: 700 clamp(28px, 5vw, 40px)/1.1 var(--display); margin: 8px 0 6px; text-wrap: balance; }
+.sub { color: var(--muted); max-width: 60ch; margin: 0; }
+.asat { font: 12px/1.5 var(--mono); color: var(--muted); text-align: right; }
+.toggle { display: inline-flex; align-items: center; gap: 10px; margin-top: 8px; cursor: pointer; font: 500 14px var(--body); color: var(--ink); }
+.toggle input { width: 18px; height: 18px; accent-color: var(--prop); }
+
+nav { display: flex; gap: 4px; overflow-x: auto; margin: 20px 0 22px; padding-bottom: 2px; scrollbar-width: thin; }
+nav button { flex: none; font: 500 14px var(--body); color: var(--muted); background: transparent; border: 1px solid transparent; border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+nav button:hover { color: var(--ink); border-color: var(--line); }
+nav button[aria-selected="true"] { color: var(--sheet); background: var(--ink); }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--prop); outline-offset: 2px; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 28px; align-items: start; }
+@media (max-width: 820px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+form { display: grid; gap: 18px; background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 22px; }
+form h2 { font: 700 20px/1.25 var(--display); margin: 0; }
+form .intro { margin: -10px 0 0; color: var(--muted); font-size: 14px; }
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+label.f { display: grid; gap: 6px; font: 500 13px var(--body); color: var(--muted); min-width: 0; }
+label.f small { font-weight: 400; color: var(--muted); }
+input[type=text], input[type=date], select {
+  width: 100%; font: 15px var(--body); color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 7px; padding: 10px 12px; min-width: 0; }
+input.money { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.check { display: flex; gap: 10px; align-items: center; font: 14px var(--body); }
+.check input { width: 18px; height: 18px; accent-color: var(--prop); }
+fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 14px; }
+legend { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+hr { border: 0; border-top: 1px dashed var(--line); margin: 2px 0; width: 100%; }
+
+aside { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 16px; }
+@media (max-width: 820px) { aside { position: static; } }
+.stamp {
+  --perf: 4px;
+  background: var(--stamp-soft); color: var(--ink); padding: 18px; position: relative;
+  /* perforations only along the edges: hole pattern, plus a solid inner panel */
+  -webkit-mask:
+    radial-gradient(circle var(--perf) at var(--perf) var(--perf), #0000 98%, #000) calc(-1 * var(--perf)) calc(-1 * var(--perf)) / calc(var(--perf) * 3) calc(var(--perf) * 3) round,
+    linear-gradient(#000 0 0) center / calc(100% - var(--perf) * 4) calc(100% - var(--perf) * 4) no-repeat;
+          mask:
+    radial-gradient(circle var(--perf) at var(--perf) var(--perf), #0000 98%, #000) calc(-1 * var(--perf)) calc(-1 * var(--perf)) / calc(var(--perf) * 3) calc(var(--perf) * 3) round,
+    linear-gradient(#000 0 0) center / calc(100% - var(--perf) * 4) calc(100% - var(--perf) * 4) no-repeat;
+  -webkit-mask-composite: source-over;
+          mask-composite: add;
+}
+.stamp .inner { border: 1.5px solid var(--stamp); padding: 16px 18px; display: grid; gap: 6px; }
+.stamp .lbl { font: 500 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--stamp); }
+.stamp .big { font: 700 clamp(32px, 6vw, 44px)/1.05 var(--display); font-variant-numeric: tabular-nums; color: var(--stamp); overflow-wrap: anywhere; }
+.stamp .big small { font: 500 16px var(--mono); margin-right: 4px; }
+.stamp .phase { font-size: 13px; color: var(--muted); }
+
+.card { background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 12px; min-width: 0; }
+.card h3 { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+td { padding: 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+td.n { text-align: right; font: 14px var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; padding-left: 12px; }
+tr.total td { border-bottom: 0; font-weight: 600; padding-top: 10px; }
+tr.total td.n { font-weight: 500; color: var(--stamp); }
+tr.minus td.n { color: var(--ok); }
+.basis { font-size: 13px; color: var(--muted); margin: 0; }
+.note { font-size: 13px; padding: 9px 12px; border-radius: 7px; background: var(--warn-soft); color: var(--warn); }
+.note.proposal { background: var(--prop-soft); color: var(--prop); }
+.copy { justify-self: start; font: 500 13px var(--body); color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 7px; padding: 8px 12px; cursor: pointer; }
+.copy:hover { border-color: var(--muted); }
+
+footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; font-size: 13px; color: var(--muted); }
+footer h4 { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; margin: 0 0 10px; color: var(--ink); }
+footer ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+footer a { color: var(--prop); }
+footer p { margin: 0 0 8px; max-width: 65ch; }
+.cite { font: 600 12px/1 var(--display); color: var(--prop); background: var(--prop-soft); border: 0; border-radius: 4px; padding: 3px 6px; margin-left: 6px; cursor: pointer; vertical-align: 1px; }
+.cite:hover, .cite[aria-expanded="true"] { background: var(--prop); color: var(--sheet); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips .cite { margin: 0; padding: 6px 9px; font: 500 12px var(--body); }
+.chips .cite b { font-family: var(--display); margin-right: 4px; }
+#law { position: fixed; z-index: 30; background: var(--sheet); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 12px 40px rgba(10, 20, 30, .22); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+@media (min-width: 821px) { #law { top: calc(env(safe-area-inset-top, 0px) + 12px); bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); right: calc(env(safe-area-inset-right, 0px) + 12px); width: min(460px, calc(100vw - 24px)); border-radius: 12px; } }
+@media (max-width: 820px) { #law { left: 0; right: 0; bottom: 0; max-height: 78vh; border-radius: 14px 14px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); } }
+#law[hidden], [hidden] { display: none !important; }
+.byline { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 13px; color: var(--muted); margin-top: 10px; }
+.coffee { display: inline-flex; align-items: center; gap: 6px; font: 700 13px var(--body); color: #0d0c22; background: #ffdd00; border: 1.5px solid #0d0c22; border-radius: 999px; padding: 6px 13px; text-decoration: none; box-shadow: 0 2px 0 #0d0c22; }
+.coffee:hover { background: #ffe633; }
+.fb { color: var(--prop); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.coffee:active { transform: translateY(1px); box-shadow: 0 1px 0 #0d0c22; }
+.coffee:focus-visible { outline: 2px solid var(--prop); outline-offset: 3px; }
+.coffee svg { width: 15px; height: 15px; }
+#welcome { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; background: rgba(10, 18, 28, .5);
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+#welcome .card { width: min(440px, 100%); padding: 24px; gap: 14px; box-shadow: 0 20px 60px rgba(10, 20, 30, .3); }
+#welcome h2 { font: 700 22px/1.2 var(--display); margin: 0; text-wrap: balance; }
+#welcome p { margin: 0; color: var(--muted); }
+#welcome .acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+#welcome .coffee { font-size: 14px; padding: 10px 16px; }
+#welcome .go { font: 600 14px var(--body); color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+#law header { display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 12px; align-items: start; padding: 16px 18px 12px; border-bottom: 1px solid var(--line); }
+#law h2 { font: 700 17px/1.3 var(--display); margin: 0; }
+#law .lsub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+#law .x { flex: none; border: 1px solid var(--line); background: var(--field); color: var(--ink); border-radius: 7px; width: 32px; height: 32px; font-size: 18px; cursor: pointer; }
+#law .lbody { overflow-y: auto; padding: 14px 18px 18px; display: grid; gap: 18px; align-content: start; }
+.prov { display: grid; gap: 10px; }
+.prov h3 { font: 700 15px/1.3 var(--display); margin: 0; }
+.prov .psub { font-size: 12.5px; color: var(--muted); margin-top: -6px; }
+.prov blockquote { margin: 0; padding: 2px 0 2px 14px; border-left: 2px solid var(--prop); font: 15px/1.6 var(--display); }
+.prov blockquote.tbl { border-left-style: dashed; }
+.prov .seglbl { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; display: block; }
+.prov .ed { font-size: 13px; padding: 9px 12px; border-radius: 7px; background: var(--field); color: var(--muted); }
+.prov .ed b { color: var(--ink); font-weight: 600; }
+.prov .badge { justify-self: start; font: 500 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 5px 8px; border-radius: 4px; background: var(--prop-soft); color: var(--prop); }
+.prov .badge.unv { background: var(--warn-soft); color: var(--warn); }
+.prov .srcline { font-size: 12px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; }
+#law footer { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 12px 18px; border-top: 1px solid var(--line); margin: 0; font-size: 12px; color: var(--muted); }
+#law footer .copy { flex: none; }
+@media (prefers-reduced-motion: no-preference) { .stamp .big { transition: color .2s; } #law { transition: opacity .15s; } }
+</style>
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)} body{margin:0;font-size:15px} img{max-width:100%} [hidden]{display:none!important}</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Akta Setem 1949 · First Schedule</div>
+      <h1>Malaysia Stamp Duty Calculator</h1>
+      <p class="sub">Works out duty on property transfers, loans, share transfers, tenancies, service agreements and late-stamping penalties, with the exemption and remission orders in force applied.</p>
+      <div class="byline"><span>Built by Ray</span><span>Rates last checked <b class="checked-on">10 November 2026</b></span><a class="fb" href="https://www.linkedin.com/in/rachelcjw/" target="_blank" rel="noopener">Send feedback on LinkedIn</a><a class="coffee" href="https://buymeacoffee.com/rachelcjw" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"/><path d="M6 2v2M10 2v2M14 2v2"/></svg>Buy me a coffee</a></div>
+    </div>
+    <div class="asat">
+      <label class="toggle"><input type="checkbox" id="proposals"> Include Budget 2027 proposals</label>
+    </div>
+  </header>
+
+  <nav role="tablist" id="tabs">
+    <button role="tab" data-tab="property" aria-selected="true">Property transfer</button>
+    <button role="tab" data-tab="loan" aria-selected="false">Loan &amp; financing</button>
+    <button role="tab" data-tab="shares" aria-selected="false">Share transfer</button>
+    <button role="tab" data-tab="tenancy" aria-selected="false">Tenancy</button>
+    <button role="tab" data-tab="services" aria-selected="false">Services &amp; employment</button>
+    <button role="tab" data-tab="penalty" aria-selected="false">Late penalty</button>
+  </nav>
+
+  <div class="grid">
+    <div>
+      <!-- PROPERTY -->
+      <form data-panel="property" id="f-property">
+        <h2>Memorandum of transfer or deed of assignment</h2>
+        <p class="intro">Duty is charged on the higher of the price and the market value.</p>
+        <div class="row">
+          <label class="f">Purchase price (RM)<input type="text" class="money" id="p-price" inputmode="decimal" value="650,000"></label>
+          <label class="f">Market value (RM) <small>if higher or no price</small><input type="text" class="money" id="p-mv" inputmode="decimal" value=""></label>
+        </div>
+        <div class="row">
+          <label class="f">Transferee
+            <select id="p-who">
+              <option value="citizen">Malaysian citizen</option>
+              <option value="pr">Permanent resident</option>
+              <option value="localCo">Malaysian company</option>
+              <option value="foreignInd">Non-citizen individual (not PR)</option>
+              <option value="foreignCo">Foreign company</option>
+            </select></label>
+          <label class="f">Property
+            <select id="p-type">
+              <option value="residential">Residential (house, condo, flat, serviced apartment, SoHo for dwelling)</option>
+              <option value="commercial">Non-residential</option>
+            </select></label>
+        </div>
+        <div class="row">
+          <label class="f">Relief claimed
+            <select id="p-relief">
+              <option value="none">None</option>
+              <option value="firstHome">First residential home</option>
+              <option value="loveAffection">Love and affection: parent/child or grandparent/grandchild</option>
+              <option value="spouse">Love and affection: husband and wife</option>
+              <option value="exchange">Exchange of property between family members, no consideration</option>
+              <option value="estate">Renunciation between estate beneficiaries</option>
+            </select></label>
+          <label class="f">Transfer executed on<input type="date" id="p-exec" value="2026-11-06"></label>
+        </div>
+        <label class="f" id="p-spa-wrap">SPA signed on <small>for the first-home exemption</small><input type="date" id="p-spa" value="2026-10-15"></label>
+        <hr>
+        <fieldset>
+          <legend>Financing (optional)</legend>
+          <label class="f">Loan amount (RM)<input type="text" class="money" id="p-loan" inputmode="decimal" value="585,000"></label>
+        </fieldset>
+      </form>
+
+      <!-- LOAN -->
+      <form data-panel="loan" id="f-loan" hidden>
+        <h2>Loan or financing agreement</h2>
+        <p class="intro">For a property purchase loan with a first-home claim, use the Property tab.</p>
+        <div class="row">
+          <label class="f">Principal amount (RM)<input type="text" class="money" id="l-amt" inputmode="decimal" value="2,000,000"></label>
+          <label class="f">Executed on<input type="date" id="l-exec" value="2026-11-06"></label>
+        </div>
+        <label class="f">Type of instrument
+          <select id="l-type">
+            <option value="secured">Ringgit loan or financing agreement (0.5%)</option>
+            <option value="sme">Loan or financing to an SME (item 27(a)(i) tiers)</option>
+            <option value="unsecured">No security, repayable on demand or single bullet (0.1%)</option>
+            <option value="foreignCurrency">Foreign-currency financing from a bank in Malaysia</option>
+            <option value="hirePurchase">Hire purchase or financing to buy goods</option>
+            <option value="cakna">CAKNA I financing (MSME / Government contractor)</option>
+          </select></label>
+      </form>
+
+      <!-- SHARES -->
+      <form data-panel="shares" id="f-shares" hidden>
+        <h2>Transfer of unlisted shares</h2>
+        <p class="intro">LHDN takes the highest of the consideration, the pro-rata net tangible assets and any other valuation it adopts.</p>
+        <div class="row">
+          <label class="f">Consideration (RM)<input type="text" class="money" id="s-cons" inputmode="decimal" value="750,000"></label>
+          <label class="f">Company NTA, latest audited (RM)<input type="text" class="money" id="s-nta" inputmode="decimal" value="1,200,000"></label>
+        </div>
+        <div class="row">
+          <label class="f">Total issued shares<input type="text" class="money" id="s-total" inputmode="decimal" value="100,000"></label>
+          <label class="f">Shares transferred<input type="text" class="money" id="s-tr" inputmode="decimal" value="50,000"></label>
+        </div>
+        <label class="f">Other valuation (RM) <small>optional, e.g. PER basis</small><input type="text" class="money" id="s-other" inputmode="decimal" value=""></label>
+      </form>
+
+      <!-- TENANCY -->
+      <form data-panel="tenancy" id="f-tenancy" hidden>
+        <h2>Tenancy or lease agreement</h2>
+        <p class="intro">Charged per RM250 or part of annual rent. If the rent steps up, enter the average annual rent.</p>
+        <div class="row">
+          <label class="f">Monthly rent (RM)<input type="text" class="money" id="t-rent" inputmode="decimal" value="2,000"></label>
+          <label class="f">Term (months)<input type="text" class="money" id="t-months" inputmode="numeric" value="24"></label>
+        </div>
+        <div class="row">
+          <label class="f">Average annual rent (RM) <small>overrides monthly rent</small><input type="text" class="money" id="t-avg" inputmode="decimal" value=""></label>
+          <label class="f">Executed on<input type="date" id="t-exec" value="2026-11-06"></label>
+        </div>
+        <div class="row">
+          <label class="f">Extra stamped copies <small>RM10 each</small><input type="text" class="money" id="t-copies" inputmode="numeric" value="1"></label>
+          <label class="check" style="align-self:end;padding-bottom:10px"><input type="checkbox" id="t-indef"> Indefinite term</label>
+        </div>
+      </form>
+
+      <!-- SERVICES -->
+      <form data-panel="services" id="f-services" hidden>
+        <h2>Service agreement or employment contract</h2>
+        <div class="row">
+          <label class="f">Instrument
+            <select id="v-type">
+              <option value="oneTier">Service agreement, one tier or first level (private)</option>
+              <option value="subsequent">Subsequent level in a multi-tier contract</option>
+              <option value="govFirst">First level with Government or local authority</option>
+              <option value="employment">Employment contract</option>
+            </select></label>
+          <label class="f">Executed on<input type="date" id="v-exec" value="2026-11-06"></label>
+        </div>
+        <label class="f" id="v-val-wrap">Contract value (RM)<input type="text" class="money" id="v-val" inputmode="decimal" value="1,000,000"></label>
+        <label class="f" id="v-wage-wrap" hidden>Monthly wages (RM)<input type="text" class="money" id="v-wage" inputmode="decimal" value="4,500"></label>
+      </form>
+
+      <!-- PENALTY -->
+      <form data-panel="penalty" id="f-penalty" hidden>
+        <h2>Late stamping penalty</h2>
+        <p class="intro">Stamp within 30 days of execution, or within 30 days of first receipt in Malaysia if signed abroad.</p>
+        <label class="f">Duty payable (RM)<input type="text" class="money" id="x-duty" inputmode="decimal" value="1,200"></label>
+        <div class="row">
+          <label class="f" id="x-exec-wrap">Executed on<input type="date" id="x-exec" value="2026-07-01"></label>
+          <label class="f" id="x-recv-wrap" hidden>First received in Malaysia<input type="date" id="x-recv" value="2026-07-01"></label>
+          <label class="f">Stamped and paid on<input type="date" id="x-paid" value="2026-11-06"></label>
+        </div>
+        <label class="check"><input type="checkbox" id="x-out"> Signed outside Malaysia</label>
+      </form>
+    </div>
+
+    <aside aria-live="polite">
+      <div class="stamp"><div class="inner">
+        <span class="lbl" id="r-lbl">Stamp duty payable</span>
+        <span class="big" id="r-big"><small>RM</small>0</span>
+        <span class="phase" id="r-phase"></span>
+      </div></div>
+      <div class="card">
+        <h3>Breakdown</h3>
+        <table id="r-table"></table>
+        <p class="basis" id="r-basis"></p>
+        <div class="chips" id="r-chips"></div>
+        <div id="r-notes" style="display:grid;gap:8px"></div>
+        <button type="button" class="copy" id="copy">Copy breakdown</button>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <div>
+      <h4>Read this first</h4>
+      <p><b>Rates last checked <span class="checked-on">10 November 2026</span></b> against the Stamp Act 1949 and the orders listed here. Laws change after that date; check the gazette for anything newer.</p>
+      <p>An estimate for planning and fee quotes. It is not legal or tax advice. Each exemption order has conditions this page cannot check (for example, that a first-home buyer has never owned a residential property). Under self-assessment the person liable to pay is answerable for the figure filed, so confirm against the gazetted order before filing on e-Duti Setem.</p>
+      <p>Built and maintained by Ray. Free to use. Spotted a wrong rate or a missing order? <a href="https://www.linkedin.com/in/rachelcjw/" target="_blank" rel="noopener">Tell me on LinkedIn</a>. If it saved you time, <a href="https://buymeacoffee.com/rachelcjw" target="_blank" rel="noopener">buy me a coffee</a>.</p>
+      <p>Rounding follows the First Schedule: per RM100, RM250 or RM1,000 "or part thereof". The RM10 minimum applies to any dutiable instrument whose duty comes to less than RM10.</p>
+    </div>
+    <div>
+      <h4>Legal basis</h4>
+      <p>Tap any <span class="cite" style="margin:0;cursor:default">§</span> in the breakdown to read the provision itself.</p>
+      <ul>
+        <li>Stamp Act 1949 [Act 378], AGC updated text as at 1 January 2026: ss 2, 20A, 36CB, 47A; First Schedule items 4, 22, 27(a), 32 and 49(a)</li>
+        <li>Finance Act 2024 [Act 862]: ss 24 to 27 (s 20A(2), s 36CB, s 47A(1), item 49(a))</li>
+        <li>Finance Act 2025 [Act 874]: ss 26 and 29 (definition of residential property, item 4 exemption (b), item 32(aa) and (ab))</li>
+        <li>Stamp Duty (Exemption) Order 2021 [P.U. (A) 53/2021], amended by P.U. (A) 448/2025</li>
+        <li>Stamp Duty (Exemption) (No. 2) Order 2021 [P.U. (A) 54/2021], amended by P.U. (A) 449/2025</li>
+        <li>Stamp Duty (Exemption) (No. 3) Order 2023 [P.U. (A) 178/2023]</li>
+        <li>Perintah Duti Setem (Pengecualian) (No. 10) 2007 [P.U. (A) 420/2007]</li>
+        <li>Stamp Duty (Remission) Order 2021 [P.U. (A) 428/2021]</li>
+        <li>Stamp Duty (Remission) (No. 2) Order 2012 [P.U. (A) 258/2012]</li>
+      </ul>
+      <p style="margin-top:10px">Budget 2027 measures shown with the toggle are proposals from the Ministry of Finance's tax measures and are not yet law.</p>
+    </div>
+  </footer>
+</div>
+
+<div id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcome-h" hidden>
+  <div class="card">
+    <h2 id="welcome-h">Free stamp duty calculator</h2>
+    <p>Built by Ray and free for anyone to use. Tap any § to read the exact provision behind a figure.</p>
+    <p>Rates last checked <b class="checked-on">10 November 2026</b>. An estimate only, not legal advice.</p>
+    <p>If it saves you time, a coffee helps keep it updated after each Budget.</p>
+    <div class="acts"><a class="coffee" id="welcome-coffee" href="https://buymeacoffee.com/rachelcjw" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"/><path d="M6 2v2M10 2v2M14 2v2"/></svg>Buy me a coffee</a><button type="button" class="go" id="welcome-go">Go to the calculator</button></div>
+  </div>
+</div>
+<div id="law" role="dialog" aria-modal="false" aria-labelledby="law-h" hidden>
+  <header><div><h2 id="law-h">Legal text</h2><div class="lsub" id="law-sub"></div></div><button type="button" class="x" id="law-x" aria-label="Close">×</button></header>
+  <div class="lbody" id="law-body"></div>
+  <footer><span id="law-checked"></span><button type="button" class="copy" id="law-copy">Copy text</button></footer>
+</div>
+<script src="provisions.js"></script>
+<script src="calc.js"></script>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const num = (id) => { const v = parseFloat(String($(id).value).replace(/[^0-9.]/g, "")); return isFinite(v) ? v : 0; };
+  const money = (n) => SD.fmt(n, n % 1 ? 2 : 0);
+  let tab = "property";
+  let lastText = "";
+
+  // tabs
+  document.querySelectorAll("#tabs button").forEach((b) => b.addEventListener("click", () => {
+    tab = b.dataset.tab;
+    document.querySelectorAll("#tabs button").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+    document.querySelectorAll("form[data-panel]").forEach((f) => (f.hidden = f.dataset.panel !== tab));
+    try { localStorage.setItem("sd-tab", tab); } catch (e) {}
+    render();
+  }));
+  try { const t = localStorage.getItem("sd-tab"); if (t) document.querySelector(`#tabs button[data-tab="${t}"]`)?.click(); } catch (e) {}
+
+  document.querySelectorAll("form").forEach((f) => { f.addEventListener("input", render); f.addEventListener("change", render); f.addEventListener("submit", (e) => e.preventDefault()); });
+  $("proposals").addEventListener("change", render);
+
+  // reformat money fields on blur
+  document.querySelectorAll("input.money").forEach((el) => el.addEventListener("blur", () => {
+    const raw = String(el.value).replace(/[^0-9.]/g, "");
+    if (raw !== "" && isFinite(parseFloat(raw))) el.value = SD.fmt(parseFloat(raw), raw.includes(".") ? 2 : 0);
+  }));
+
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const citeBtn = (ids) => ids && ids.length ? `<button type="button" class="cite" data-ids="${ids.join(",")}" aria-label="Show the provision">§</button>` : "";
+  const shortName = (id) => { const p = PROVISIONS[id]; if (!p) return id;
+    const m = p.title.match(/(section \w+|item [\w()-]+)/i); if (m && p.src === "act") return m[1].replace(/^section/i, "s").replace(/^item/i, "Item");
+    const pu = (p.sub.match(/P\.U\. \(A\) \d+\/\d{4}/) || [])[0]; return pu || p.title; };
+
+  function show(big, label, phase, rows, basis, notes, cites) {
+    $("r-lbl").textContent = label;
+    $("r-big").innerHTML = "<small>RM</small>" + money(big);
+    $("r-phase").textContent = phase || "";
+    $("r-table").innerHTML = rows.map((r) =>
+      `<tr class="${r.cls || ""}"><td>${esc(r.label)}${citeBtn(r.cite)}</td><td class="n">${r.amount === null ? "" : (r.amount < 0 ? "− " : "") + "RM" + money(Math.abs(r.amount))}</td></tr>`).join("");
+    $("r-basis").textContent = basis || "";
+    const all = [...new Set([...(cites || []), ...rows.flatMap((r) => r.cite || [])])];
+    $("r-chips").innerHTML = all.map((id) => `<button type="button" class="cite" data-ids="${id}"><b>§</b>${esc(shortName(id))}</button>`).join("");
+    $("r-notes").innerHTML = (notes || []).map((n) => `<div class="note ${n.kind}">${esc(n.text)}</div>`).join("");
+    lastText = [label + ": RM" + money(big), ...rows.map((r) => r.label + (r.amount === null ? "" : ": RM" + money(r.amount))), basis].filter(Boolean).join("\n");
+  }
+
+  // ----- legal text panel -----
+  const law = $("law");
+  let pinned = false, hoverTimer = null, openIds = "", lawText = "";
+  function renderProv(id) {
+    const p = PROVISIONS[id] || PROVISIONS.unverified;
+    const segs = p.body.map((s) => {
+      const lbl = s.label ? `<span class="seglbl">${esc(s.label)}</span>` : "";
+      if (s.note) return `<div class="ed"><b>Editor's note.</b> ${esc(s.note)}</div>`;
+      const txt = s.q || s.tbl;
+      return `<div>${lbl}<blockquote class="${s.tbl ? "tbl" : ""}">${esc(txt)}</blockquote></div>`;
+    }).join("");
+    const badge = p.proposal ? `<span class="badge">Proposal · not yet law</span>` : p.unverified ? `<span class="badge unv">Not verified against the gazette</span>` : "";
+    const src = p.src && SOURCES[p.src] ? `<div class="srcline">Source: ${esc(SOURCES[p.src])}</div>` : "";
+    return { html: `<section class="prov">${badge}<h3>${esc(p.title)}</h3>${p.sub ? `<div class="psub">${esc(p.sub)}</div>` : ""}${segs}${src}</section>`,
+      text: [p.title, p.sub, ...p.body.filter((s) => !s.note).map((s) => (s.label ? s.label + ": " : "") + (s.q || s.tbl))].filter(Boolean).join("\n") };
+  }
+  function openLaw(ids, pin) {
+    const list = ids.split(",");
+    const parts = list.map(renderProv);
+    $("law-h").textContent = "Legal text";
+    $("law-sub").textContent = list.map(shortName).join(" · ");
+    $("law-body").innerHTML = parts.map((x) => x.html).join("");
+    $("law-checked").textContent = "Text checked " + CHECKED_ON + ". Dashed bars mark text transcribed from a table.";
+    lawText = parts.map((x) => x.text).join("\n\n");
+    law.hidden = false; openIds = ids; pinned = pinned || !!pin;
+    document.querySelectorAll(".cite[aria-expanded]").forEach((b) => b.removeAttribute("aria-expanded"));
+    document.querySelectorAll(`.cite[data-ids="${ids}"]`).forEach((b) => b.setAttribute("aria-expanded", "true"));
+  }
+  function closeLaw() { law.hidden = true; pinned = false; openIds = "";
+    document.querySelectorAll(".cite[aria-expanded]").forEach((b) => b.removeAttribute("aria-expanded")); }
+  const fine = matchMedia("(hover: hover) and (pointer: fine)");
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest(".cite[data-ids]");
+    if (b) { e.preventDefault(); if (pinned && openIds === b.dataset.ids) closeLaw(); else { pinned = true; openLaw(b.dataset.ids, true); } return; }
+    if (!law.hidden && !law.contains(e.target) && !fine.matches) closeLaw();
+  });
+  document.addEventListener("mouseover", (e) => {
+    if (!fine.matches) return;
+    const b = e.target.closest(".cite[data-ids]");
+    if (b && !pinned) { clearTimeout(hoverTimer); hoverTimer = setTimeout(() => openLaw(b.dataset.ids, false), 120); }
+  });
+  document.addEventListener("mouseout", (e) => {
+    if (!fine.matches || pinned) return;
+    const b = e.target.closest(".cite[data-ids]");
+    if (b && !(e.relatedTarget && (law.contains(e.relatedTarget)))) { clearTimeout(hoverTimer); hoverTimer = setTimeout(() => { if (!pinned) closeLaw(); }, 250); }
+  });
+  law.addEventListener("mouseleave", () => { if (!pinned && fine.matches) closeLaw(); });
+  law.addEventListener("mouseenter", () => clearTimeout(hoverTimer));
+  $("law-x").addEventListener("click", closeLaw);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !law.hidden) closeLaw(); });
+  $("law-copy").addEventListener("click", async () => {
+    const btn = $("law-copy");
+    try { await navigator.clipboard.writeText(lawText); btn.textContent = "Copied"; }
+    catch (e) { const r = document.createRange(); r.selectNodeContents($("law-body")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Selected"; }
+    setTimeout(() => (btn.textContent = "Copy text"), 1800);
+  });
+
+  function render() {
+    const proposals = $("proposals").checked;
+    if (tab === "property") {
+      $("p-spa-wrap").hidden = $("p-relief").value !== "firstHome";
+      const r = SD.property({
+        price: num("p-price"), marketValue: num("p-mv"), transferee: $("p-who").value, propertyType: $("p-type").value,
+        relief: $("p-relief").value, execDate: $("p-exec").value, spaDate: $("p-spa").value, loan: num("p-loan"), proposals,
+      });
+      const rows = [{ label: "Dutiable value", amount: r.base, cls: "" }];
+      r.steps.forEach((s) => rows.push({ label: s.label, amount: s.amount }));
+      if (r.relief) rows.push({ label: r.relief.label, amount: r.relief.amount, cls: "minus", cite: r.relief.cite });
+      rows.push({ label: "Duty on the transfer", amount: r.payable, cls: "total" });
+      let total = r.payable;
+      if (r.loan) {
+        rows.push({ label: "Loan agreement, 0.5% on RM" + SD.fmt(SD.ceilTo(num("p-loan"), 1000)), amount: r.loan.full, cite: ["item27a"] });
+        if (r.loan.relief) rows.push({ label: r.loan.relief, amount: r.loan.due - r.loan.full, cls: "minus", cite: r.loan.cite });
+        rows.push({ label: "Duty on the loan", amount: r.loan.due, cls: "total" });
+        total += r.loan.due;
+      }
+      rows.push({ label: "SPA itself (fixed duty, per copy)", amount: 10, cite: ["item4"] });
+      total += 10;
+      show(total, r.loan ? "Total: transfer, loan and SPA" : "Total: transfer and SPA", r.phase, rows, r.basis, r.notes, r.cites);
+    } else if (tab === "loan") {
+      const r = SD.loan({ amount: num("l-amt"), type: $("l-type").value, execDate: $("l-exec").value, proposals });
+      show(r.duty, "Stamp duty payable", r.phase, [{ label: "Principal", amount: num("l-amt") }, { label: "Duty on the agreement", amount: r.duty, cls: "total" }], r.basis, r.notes, r.cites);
+    } else if (tab === "shares") {
+      const r = SD.shares({ consideration: num("s-cons"), nta: num("s-nta"), totalShares: num("s-total"), sharesTransferred: num("s-tr"), otherValue: num("s-other") });
+      const rows = r.candidates.map((c) => ({ label: c.label + (c.label === r.basisLabel ? " (used)" : ""), amount: c.value }));
+      rows.push({ label: "RM3 per RM1,000 on RM" + SD.fmt(r.rounded), amount: r.duty, cls: "total", cite: ["item32b"] });
+      rows.push({ label: "Share sale agreement (fixed duty, per copy)", amount: 10, cite: ["item4"] });
+      show(r.duty + 10, "Total: transfer form and SSA", r.phase, rows, r.basis, [], r.cites);
+    } else if (tab === "tenancy") {
+      const r = SD.tenancy({ monthly: num("t-rent"), months: num("t-months"), avgAnnual: num("t-avg"), execDate: $("t-exec").value, copies: num("t-copies"), indefinite: $("t-indef").checked });
+      const rows = [
+        { label: "Annual rent", amount: r.annual },
+        ...(r.exempt ? [{ label: "Less exempt first RM2,400 (pre-2025)", amount: -r.exempt, cls: "minus" }] : []),
+        { label: `${r.units} units of RM250 × RM${r.rate} (${r.band})`, amount: r.units * r.rate },
+        { label: "Duty on the original", amount: r.principal, cls: "total" },
+      ];
+      if (r.copies) rows.push({ label: `${r.copies} extra cop${r.copies === 1 ? "y" : "ies"} × RM10`, amount: r.copiesDuty });
+      show(r.total, r.copies ? "Total with copies" : "Stamp duty payable", r.phase, rows, r.basis, [], r.cites);
+    } else if (tab === "services") {
+      const emp = $("v-type").value === "employment";
+      $("v-val-wrap").hidden = emp; $("v-wage-wrap").hidden = !emp;
+      const r = SD.services({ type: $("v-type").value, value: num("v-val"), wage: num("v-wage"), execDate: $("v-exec").value });
+      const rows = emp ? [{ label: "Monthly wages", amount: num("v-wage") }]
+        : [{ label: "Contract value", amount: num("v-val") }, ...(r.full ? [{ label: "Duty at the full 0.5% rate", amount: r.full }, { label: "Remitted / exempt", amount: r.duty - r.full, cls: "minus" }] : [])];
+      rows.push({ label: "Duty payable", amount: r.duty, cls: "total" });
+      show(r.duty, "Stamp duty payable", r.phase, rows, r.basis, r.notes || [], r.cites);
+    } else if (tab === "penalty") {
+      const out = $("x-out").checked;
+      $("x-exec-wrap").hidden = out; $("x-recv-wrap").hidden = !out;
+      const r = SD.penalty({ duty: num("x-duty"), execDate: $("x-exec").value, receivedDate: $("x-recv").value, outside: out, paidDate: $("x-paid").value });
+      if (!r) { show(0, "Penalty", "", [], "Enter both dates.", []); return; }
+      const dfmt = (dt) => dt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+      const rows = [
+        { label: "Stamping deadline: " + dfmt(r.due), amount: null },
+        { label: r.late ? `${r.daysLate} days late` : "Paid within time", amount: null },
+        { label: "Duty", amount: num("x-duty") },
+        { label: "Penalty", amount: r.pen },
+        { label: "Total to pay", amount: r.total, cls: "total" },
+      ];
+      const notes = [];
+      if (r.late) notes.push({ kind: "warn", text: "Penalty is the greater of the fixed amount and the percentage of unpaid duty. The Collector may remit it in whole or part on application." });
+      show(r.pen, "Late stamping penalty", r.tier, rows, "Stamp Act 1949, section 47A(1) as substituted by Finance Act 2024, in force 1 January 2025.", notes, r.cites);
+    }
+  }
+
+  $("copy").addEventListener("click", async () => {
+    const btn = $("copy");
+    try { await navigator.clipboard.writeText(lastText); btn.textContent = "Copied"; }
+    catch (e) { const r = document.createRange(); r.selectNodeContents($("r-table")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Selected, press Ctrl+C"; }
+    setTimeout(() => (btn.textContent = "Copy breakdown"), 1800);
+  });
+
+  // executed-on dates default to today
+  const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  ["p-exec", "l-exec", "t-exec", "v-exec", "x-paid"].forEach((id) => { $(id).value = today; });
+
+  // dates from one source
+  document.querySelectorAll(".checked-on").forEach((el) => (el.textContent = CHECKED_ON));
+
+  // welcome pop-up, shown on every page load
+  const W = $("welcome");
+  const closeW = () => { W.hidden = true; };
+  W.hidden = false; setTimeout(() => $("welcome-go").focus(), 0);
+  $("welcome-go").addEventListener("click", closeW);
+  $("welcome-coffee").addEventListener("click", closeW);
+  W.addEventListener("click", (e) => { if (e.target === W) closeW(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !W.hidden) closeW(); });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
