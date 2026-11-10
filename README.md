@@ -58,4 +58,4 @@ The gazette PDFs are kept locally and are not part of this repo.
 
 ## Licence
 
-MIT for the code. See [`LICENSE`](LICENSE). The quoted statutory text remains subject to the rights of the Government of Malaysia and its publishers.
+See [`LICENSE`](LICENSE). The quoted statutory text remains subject to the rights of the Government of Malaysia and its publishers.
