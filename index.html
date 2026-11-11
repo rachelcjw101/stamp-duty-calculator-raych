@@ -408,8 +408,8 @@ footer p { margin: 0 0 8px; max-width: 65ch; }
   <div class="lbody" id="law-body"></div>
   <footer><span id="law-checked"></span><button type="button" class="copy" id="law-copy">Copy text</button></footer>
 </div>
-<script src="provisions.js"></script>
-<script src="calc.js"></script>
+<script src="provisions.js?v=20261111"></script>
+<script src="calc.js?v=20261111"></script>
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
@@ -426,7 +426,6 @@ footer p { margin: 0 0 8px; max-width: 65ch; }
     try { localStorage.setItem("sd-tab", tab); } catch (e) {}
     render();
   }));
-  try { const t = localStorage.getItem("sd-tab"); if (t) document.querySelector(`#tabs button[data-tab="${t}"]`)?.click(); } catch (e) {}
 
   document.querySelectorAll("form").forEach((f) => { f.addEventListener("input", render); f.addEventListener("change", render); f.addEventListener("submit", (e) => e.preventDefault()); });
   $("proposals").addEventListener("change", render);
@@ -610,7 +609,7 @@ footer p { margin: 0 0 8px; max-width: 65ch; }
   // discount slider and box stay in step; the box accepts typing
   const dRange = $("g-disc-range"), dBox = $("g-disc");
   dRange.addEventListener("input", () => { dBox.value = dRange.value; render(); });
-  dBox.addEventListener("input", () => { const v = Math.min(Math.max(num("g-disc"), 0), 25); dRange.value = v; });
+  dBox.addEventListener("input", () => { const raw = num("g-disc"); const v = Math.min(Math.max(raw, 0), 25); if (raw > 25) dBox.value = 25; dRange.value = v; });
   dBox.addEventListener("blur", () => { const v = Math.min(Math.max(num("g-disc"), 0), 25); dBox.value = v; dRange.value = v; render(); });
 
   // executed-on dates default to today
@@ -629,6 +628,8 @@ footer p { margin: 0 0 8px; max-width: 65ch; }
   W.addEventListener("click", (e) => { if (e.target === W) closeW(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !W.hidden) closeW(); });
 
+  // restore the last tab only once everything above is defined
+  try { const t = localStorage.getItem("sd-tab"); if (t) document.querySelector(`#tabs button[data-tab="${t}"]`)?.click(); } catch (e) {}
   render();
 })();
 </script>
