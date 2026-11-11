@@ -4,7 +4,7 @@ A free calculator for stamp duty under the Stamp Act 1949 [Act 378], with the ex
 
 Every figure has a **§** marker beside it. Hover over it or tap it to read the exact wording of the provision or order the figure relies on, so you can check the basis yourself.
 
-**Use it here:** https://rachelcjw101.github.io/stampduty-calc-raych/
+**Use it here:** https://rachelcjw101.github.io/stamp-duty-calculator-raych/
 
 **Rates last checked:** 10 November 2026
 
@@ -39,7 +39,7 @@ This is an estimate for planning and fee quotes. Exemption and remission orders 
 
 ## Feedback
 
-Spotted a wrong rate, a new order, or a case it doesn't handle? Get in touch on [LinkedIn](https://www.linkedin.com/in/rachelcjw/), or [open an issue](https://github.com/rachelcjw101/stampduty-calc-raych/issues) on this repo.
+Spotted a wrong rate, a new order, or a case it doesn't handle? Get in touch on [LinkedIn](https://www.linkedin.com/in/rachelcjw/), or [open an issue](https://github.com/rachelcjw101/stamp-duty-calculator-raych/issues) on this repo.
 
 If it saved you time, you can [buy me a coffee](https://buymeacoffee.com/rachelcjw).
 
