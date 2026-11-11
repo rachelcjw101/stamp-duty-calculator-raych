@@ -298,10 +298,93 @@ const SD = (() => {
     return { due, threeMonths, late, daysLate, pen: rm(pen), tier, total: rm(dutyAmt + pen), cites: ["s47A"] };
   }
 
+  // ---------- Solicitors' scale fees (SRO 2023, P.U.(A) 207/2023) ----------
+  // Table A of the First and Third Schedules
+  function sroTableA(v) {
+    if (!(v > 0)) return { fee: 0, lines: [], ceiling: false };
+    const a = Math.min(v, 500000) * 0.0125;
+    const b = Math.min(Math.max(v - 500000, 0), 7000000) * 0.01;
+    const c = Math.max(v - 7500000, 0) * 0.01;
+    const lines = [{ label: "1.25% on the first RM" + fmt(Math.min(v, 500000)), amount: rm(a) }];
+    if (b) lines.push({ label: "1% on the next RM" + fmt(Math.min(v - 500000, 7000000)), amount: rm(b) });
+    if (c) lines.push({ label: "Up to 1% on the excess over RM7,500,000 (negotiable)", amount: rm(c) });
+    let fee = a + b + c;
+    if (fee < 500) { lines.push({ label: "Raised to the RM500 minimum", amount: rm(500 - fee) }); fee = 500; }
+    return { fee: rm(fee), lines, ceiling: c > 0 };
+  }
+  // Table B (Housing Development Act transactions): a percentage of Table A
+  function sroTableB(v) {
+    const A = sroTableA(v);
+    if (v <= 50000) return { fee: 500, A, pct: null, label: "RM50,000 or less: fixed RM500" };
+    const pct = v <= 250000 ? 0.75 : v <= 500000 ? 0.70 : v <= 1000000 ? 0.65 : 0.50;
+    let fee = A.fee * pct;
+    if (v <= 250000) fee = Math.max(fee, 500);
+    return { fee: rm(fee), A, pct, label: `${pct * 100}% of the Table A fee of RM${fmt(A.fee, A.fee % 1 ? 2 : 0)}` };
+  }
+
+  function legalFees(o) {
+    const type = o.type || "sale";
+    const disc = Math.min(Math.max(o.discount || 0, 0), 25);
+    const sstRate = o.sstRate >= 0 ? o.sstRate : 8;
+    const lines = [], notes = [], cites = ["sro-para3"];
+    let fee = 0, low = null, discountable = false, basis = "", ceiling = false;
+
+    if (type === "sale" || type === "loan") {
+      const v = o.amount || 0;
+      const sched = type === "sale" ? "First" : "Third";
+      cites.unshift(type === "sale" ? "sro-first" : "sro-third");
+      const A = sroTableA(v);
+      if (o.hda) {
+        const B = sroTableB(v);
+        lines.push({ label: `${sched} Schedule, Table B: ${B.label}`, amount: B.fee });
+        fee = B.fee;
+        basis = `Solicitors' Remuneration Order 2023, ${sched} Schedule, Table B (transactions under the Housing Development (Control and Licensing) Act 1966)`;
+      } else {
+        A.lines.forEach((l) => lines.push(l));
+        fee = A.fee; discountable = true; ceiling = A.ceiling;
+        basis = `Solicitors' Remuneration Order 2023, ${sched} Schedule, Table A`;
+      }
+      if (type === "loan" && o.subsidiary > 0) {
+        const each = rm(Math.min(Math.max(A.fee * 0.1, 500), 2000));
+        lines.push({ label: `${o.subsidiary} subsidiary instrument${o.subsidiary > 1 ? "s" : ""} at 10% of the Table A fee (min RM500, max RM2,000) each`, amount: rm(each * o.subsidiary) });
+        fee = rm(fee + each * o.subsidiary);
+      }
+      if (ceiling) notes.push({ kind: "warn", text: "Above RM7,500,000 the fee on the excess is negotiable, up to 1%. The figure shown is the maximum." });
+    } else {
+      const lease = type === "lease";
+      const r = o.rent || 0;
+      cites.unshift("sro-second");
+      const [p1, lo, hi, min] = lease ? [0.6, 0.3, 0.5, 1000] : [0.3, 0.15, 0.25, 500];
+      if (r <= 10000) {
+        fee = Math.max(r * p1, min);
+        lines.push({ label: `${p1 * 100}% of monthly rent of RM${fmt(r)} (minimum RM${fmt(min)})`, amount: rm(fee) });
+      } else {
+        fee = r * hi; low = r * lo;
+        lines.push({ label: `Between ${lo * 100}% and ${hi * 100}% of monthly rent of RM${fmt(r)}; maximum shown`, amount: rm(fee) });
+        notes.push({ kind: "warn", text: `Where monthly rent exceeds RM10,000 the fee is between ${lo * 100}% and ${hi * 100}% of the monthly rent: RM${fmt(low)} to RM${fmt(fee)}. The figure shown is the maximum.` });
+      }
+      if (o.bulk) {
+        const half = Math.max(fee * 0.5, r <= 10000 ? min : 0);
+        lines.push({ label: "Rule 5: 50% for 10+ units on a standard form, or a renewal (acting for the landlord)", amount: rm(half - fee) });
+        fee = half; if (low !== null) low = low * 0.5;
+      }
+      fee = rm(fee);
+      basis = `Solicitors' Remuneration Order 2023, Second Schedule (${lease ? "lease" : "tenancy"})`;
+    }
+
+    const discAmt = discountable ? rm(fee * disc / 100) : 0;
+    const net = rm(fee - discAmt);
+    const sst = rm(net * sstRate / 100);
+    cites.push("sro-para6");
+    if (!discountable && disc > 0) notes.push({ kind: "warn", text: "No discount is allowed on this fee. SRO 2023 para 6 permits a discount of up to 25% only on Table A of the First and Third Schedules." });
+    notes.push({ kind: "warn", text: "Excludes disbursements: stamp duty, registration fees, search fees, valuer or auctioneer fees, travel and other out-of-pocket expenses are billed separately (SRO 2023 para 3(1))." });
+    return { fee, discountable, disc: discountable ? disc : 0, discAmt, net, sstRate, sst, total: rm(net + sst), low, lines, notes, basis, cites, ceiling };
+  }
+
   function fmt(n, dp = 0) {
     return Number(n).toLocaleString("en-MY", { minimumFractionDigits: dp, maximumFractionDigits: dp });
   }
 
-  return { scale, property, loan, shares, tenancy, services, penalty, fmt, ceilTo };
+  return { scale, property, loan, shares, tenancy, services, penalty, legalFees, sroTableA, sroTableB, fmt, ceilTo };
 })();
 if (typeof module !== "undefined") module.exports = SD;

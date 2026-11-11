@@ -122,6 +122,10 @@ footer p { margin: 0 0 8px; max-width: 65ch; }
 @media (min-width: 821px) { #law { top: calc(env(safe-area-inset-top, 0px) + 12px); bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); right: calc(env(safe-area-inset-right, 0px) + 12px); width: min(460px, calc(100vw - 24px)); border-radius: 12px; } }
 @media (max-width: 820px) { #law { left: 0; right: 0; bottom: 0; max-height: 78vh; border-radius: 14px 14px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); } }
 #law[hidden], [hidden] { display: none !important; }
+.disc { display: grid; gap: 6px; }
+.disc-row { display: grid; grid-template-columns: minmax(0, 1fr) 84px; gap: 12px; align-items: center; }
+.disc-row input[type=range] { width: 100%; accent-color: var(--prop); height: 28px; }
+.disc-row input[type=range]:disabled, .disc-row input:disabled { opacity: .45; cursor: not-allowed; }
 .byline { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 13px; color: var(--muted); margin-top: 10px; }
 .coffee { display: inline-flex; align-items: center; gap: 6px; font: 700 13px var(--body); color: #0d0c22; background: #ffdd00; border: 1.5px solid #0d0c22; border-radius: 999px; padding: 6px 13px; text-decoration: none; box-shadow: 0 2px 0 #0d0c22; }
 .coffee:hover { background: #ffe633; }
@@ -180,6 +184,7 @@ footer p { margin: 0 0 8px; max-width: 65ch; }
     <button role="tab" data-tab="tenancy" aria-selected="false">Tenancy</button>
     <button role="tab" data-tab="services" aria-selected="false">Services &amp; employment</button>
     <button role="tab" data-tab="penalty" aria-selected="false">Late penalty</button>
+    <button role="tab" data-tab="fees" aria-selected="false">Legal fees</button>
   </nav>
 
   <div class="grid">
@@ -308,6 +313,40 @@ footer p { margin: 0 0 8px; max-width: 65ch; }
         </div>
         <label class="check"><input type="checkbox" id="x-out"> Signed outside Malaysia</label>
       </form>
+
+      <!-- LEGAL FEES -->
+      <form data-panel="fees" id="f-fees" hidden>
+        <h2>Solicitors' scale fees</h2>
+        <p class="intro">Under the Solicitors' Remuneration Order 2023, for matters begun on or after 15 July 2023. Professional fees only.</p>
+        <label class="f">Transaction
+          <select id="g-type">
+            <option value="sale">Sale and purchase or transfer (First Schedule)</option>
+            <option value="loan">Loan, charge or financing (Third Schedule)</option>
+            <option value="tenancy">Tenancy (Second Schedule)</option>
+            <option value="lease">Lease (Second Schedule)</option>
+          </select></label>
+        <div class="row" id="g-amt-row">
+          <label class="f"><span id="g-amt-lbl">Price or adjudicated value (RM)</span><input type="text" class="money" id="g-amt" inputmode="decimal" value="650,000"></label>
+          <label class="f" id="g-sub-wrap" hidden>Subsidiary instruments <small>e.g. assignment, guarantee</small><input type="text" class="money" id="g-sub" inputmode="numeric" value="0"></label>
+        </div>
+        <label class="check" id="g-hda-wrap"><input type="checkbox" id="g-hda"> Developer sale under the Housing Development Act (Table B)</label>
+        <div class="row" id="g-rent-row" hidden>
+          <label class="f">Monthly rent (RM) <small>include service charges and furniture hire</small><input type="text" class="money" id="g-rent" inputmode="decimal" value="3,500"></label>
+        </div>
+        <label class="check" id="g-bulk-wrap" hidden><input type="checkbox" id="g-bulk"> Acting for the landlord: 10 or more units on a standard form, or a renewal on the same terms</label>
+        <hr>
+        <fieldset>
+          <legend>Discount and tax</legend>
+          <div class="disc">
+            <label class="f" for="g-disc">Discount (%) <small id="g-disc-hint">Up to 25%, Table A fees only</small></label>
+            <div class="disc-row">
+              <input type="range" id="g-disc-range" min="0" max="25" step="0.5" value="0" aria-label="Discount slider">
+              <input type="text" class="money" id="g-disc" inputmode="decimal" value="0" aria-describedby="g-disc-hint">
+            </div>
+          </div>
+          <label class="f">Service tax (%) <small>8% for legal services</small><input type="text" class="money" id="g-sst" inputmode="decimal" value="8"></label>
+        </fieldset>
+      </form>
     </div>
 
     <aside aria-live="polite">
@@ -348,6 +387,7 @@ footer p { margin: 0 0 8px; max-width: 65ch; }
         <li>Perintah Duti Setem (Pengecualian) (No. 10) 2007 [P.U. (A) 420/2007]</li>
         <li>Stamp Duty (Remission) Order 2021 [P.U. (A) 428/2021]</li>
         <li>Stamp Duty (Remission) (No. 2) Order 2012 [P.U. (A) 258/2012]</li>
+        <li>Solicitors' Remuneration Order 2023 [P.U. (A) 207/2023]: paras 3 and 6; First, Second and Third Schedules (legal fees tab)</li>
       </ul>
       <p style="margin-top:10px">Budget 2027 measures shown with the toggle are proposals from the Ministry of Finance's tax measures and are not yet law.</p>
     </div>
@@ -399,7 +439,7 @@ footer p { margin: 0 0 8px; max-width: 65ch; }
 
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const citeBtn = (ids) => ids && ids.length ? `<button type="button" class="cite" data-ids="${ids.join(",")}" aria-label="Show the provision">§</button>` : "";
-  const shortName = (id) => { const p = PROVISIONS[id]; if (!p) return id;
+  const shortName = (id) => { const p = PROVISIONS[id]; if (!p) return id; if (p.short) return p.short;
     const m = p.title.match(/(section \w+|item [\w()-]+)/i); if (m && p.src === "act") return m[1].replace(/^section/i, "s").replace(/^item/i, "Item");
     const pu = (p.sub.match(/P\.U\. \(A\) \d+\/\d{4}/) || [])[0]; return pu || p.title; };
 
@@ -538,6 +578,25 @@ footer p { margin: 0 0 8px; max-width: 65ch; }
       const notes = [];
       if (r.late) notes.push({ kind: "warn", text: "Penalty is the greater of the fixed amount and the percentage of unpaid duty. The Collector may remit it in whole or part on application." });
       show(r.pen, "Late stamping penalty", r.tier, rows, "Stamp Act 1949, section 47A(1) as substituted by Finance Act 2024, in force 1 January 2025.", notes, r.cites);
+    } else if (tab === "fees") {
+      const type = $("g-type").value, rental = type === "tenancy" || type === "lease";
+      $("g-amt-row").hidden = rental; $("g-hda-wrap").hidden = rental;
+      $("g-rent-row").hidden = !rental; $("g-bulk-wrap").hidden = !rental;
+      $("g-sub-wrap").hidden = type !== "loan";
+      $("g-amt-lbl").textContent = type === "loan" ? "Amount secured or financed (RM)" : "Price or adjudicated value (RM)";
+      const r = SD.legalFees({ type, amount: num("g-amt"), hda: $("g-hda").checked, subsidiary: Math.floor(num("g-sub")),
+        rent: num("g-rent"), bulk: $("g-bulk").checked, discount: num("g-disc"), sstRate: num("g-sst") });
+      $("g-disc-range").disabled = $("g-disc").disabled = !r.discountable;
+      $("g-disc-hint").textContent = r.discountable ? "Up to 25%, Table A fees only" : "Not allowed for this fee (SRO 2023 para 6(2))";
+      const cite = r.cites[0];
+      const rows = r.lines.map((l) => ({ label: l.label, amount: l.amount, cite: [cite] }));
+      rows.push({ label: "Scale fee", amount: r.fee, cls: "total" });
+      if (r.discAmt) rows.push({ label: `Discount ${SD.fmt(r.disc, r.disc % 1 ? 1 : 0)}%`, amount: -r.discAmt, cls: "minus", cite: ["sro-para6"] });
+      if (r.discAmt) rows.push({ label: "Professional fee after discount", amount: r.net, cls: "total" });
+      rows.push({ label: `Service tax at ${SD.fmt(r.sstRate, r.sstRate % 1 ? 1 : 0)}%`, amount: r.sst, cite: ["sst-legal"] });
+      rows.push({ label: "Legal fees including service tax", amount: r.total, cls: "total" });
+      rows.push({ label: "Disbursements (stamp duty, registration and search fees, etc.)", amount: null, cite: ["sro-para3"] });
+      show(r.total, (r.ceiling || r.low !== null ? "Up to: " : "") + "Legal fees incl. service tax", "Excludes disbursements", rows, r.basis, r.notes, [...r.cites, "sst-legal"]);
     }
   }
 
@@ -547,6 +606,12 @@ footer p { margin: 0 0 8px; max-width: 65ch; }
     catch (e) { const r = document.createRange(); r.selectNodeContents($("r-table")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Selected, press Ctrl+C"; }
     setTimeout(() => (btn.textContent = "Copy breakdown"), 1800);
   });
+
+  // discount slider and box stay in step; the box accepts typing
+  const dRange = $("g-disc-range"), dBox = $("g-disc");
+  dRange.addEventListener("input", () => { dBox.value = dRange.value; render(); });
+  dBox.addEventListener("input", () => { const v = Math.min(Math.max(num("g-disc"), 0), 25); dRange.value = v; });
+  dBox.addEventListener("blur", () => { const v = Math.min(Math.max(num("g-disc"), 0), 25); dBox.value = v; dRange.value = v; render(); });
 
   // executed-on dates default to today
   const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);

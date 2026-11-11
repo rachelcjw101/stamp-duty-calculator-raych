@@ -18,6 +18,7 @@ Every figure has a **§** marker beside it. Hover over it or tap it to read the 
 | Tenancy | Item 49(a) scale by length of term, with extra copies |
 | Services & employment | Service agreements and employment contracts |
 | Late penalty | Section 47A penalty from the stamping deadline |
+| Legal fees | Solicitors' scale fees under the Solicitors' Remuneration Order 2023 for sales, loans, tenancies and leases, with the discount allowed and service tax. Disbursements are not included |
 
 A toggle shows Budget 2027 proposals. These are clearly marked and are not law until gazetted.
 
@@ -25,7 +26,7 @@ A toggle shows Budget 2027 proposals. These are clearly marked and are not law u
 
 The rates and the quoted text come from official sources only:
 
-- **Federal Government Gazette** (Warta Kerajaan Persekutuan), through the Attorney General's Chambers' Laws of Malaysia portal at [lom.agc.gov.my](https://lom.agc.gov.my/). This covers the Stamp Act 1949, the Finance Act 2024 [Act 862], the Finance Act 2025 [Act 874], and the P.U. (A) exemption and remission orders.
+- **Federal Government Gazette** (Warta Kerajaan Persekutuan), through the Attorney General's Chambers' Laws of Malaysia portal at [lom.agc.gov.my](https://lom.agc.gov.my/). This covers the Stamp Act 1949, the Finance Act 2024 [Act 862], the Finance Act 2025 [Act 874], the P.U. (A) exemption and remission orders, and the Solicitors' Remuneration Order 2023 [P.U. (A) 207/2023].
 - **Inland Revenue Board of Malaysia (LHDN)** website at [hasil.gov.my](https://www.hasil.gov.my/). This covers stamp duty orders, guidance, and the self-assessment timeline.
 - **Ministry of Finance** Budget 2027 tax measures, for the proposals shown behind the toggle only.
 
