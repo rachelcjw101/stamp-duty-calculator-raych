@@ -4,7 +4,7 @@ const { PROVISIONS } = require("./provisions.js");
 const dir = process.argv[2];
 if (!dir) { console.log('Usage: node verify-provisions.js "<folder with the source .txt files>"'); process.exit(1); }
 const files = { act: "Act 378 (online 2026).txt", pua53: "PUA53-54.txt", pua448: "PUA448.txt", pua449: "PUA449.txt",
-  pua178: "pua 178.txt", pua420: "PUA_420_2007_BM.txt", pua428: "PUA 428.txt", pua258: "PUA_258_2012.txt", budget: "tax-measures.txt", fa2024: "FA 2024.txt", fa2025: "FA 2025.txt" };
+  pua178: "pua 178.txt", pua420: "PUA_420_2007_BM.txt", pua428: "PUA 428.txt", pua258: "PUA_258_2012.txt", budget: "tax-measures.txt", fa2024: "FA 2024.txt", fa2025: "FA 2025.txt", sro: "Circular No 185-2023.txt" };
 const norm = (s) => s.replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/[—–]/g, "-")
   .replace(/\*/g, "").replace(/\s+/g, " ").trim();
 const cache = {};

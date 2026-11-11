@@ -24,4 +24,17 @@ const pen=SD.penalty({duty:261,execDate:'2026-01-01',paidDate:'2026-03-02'});
 eq('pen within3',pen.pen,50);
 eq('pen >3',SD.penalty({duty:261,execDate:'2026-01-01',paidDate:'2026-06-15'}).pen,100);
 eq('fc cap',SD.loan({amount:10000000,type:'foreignCurrency',execDate:'2027-02-01',proposals:true}).duty,2000);
+// Solicitors' Remuneration Order 2023 (legal fees)
+const lf=(o)=>SD.legalFees(o);
+eq('SRO sale 650k Table A',lf({type:'sale',amount:650000}).fee,7750);
+eq('SRO sale 650k, 25% discount, 8% SST',lf({type:'sale',amount:650000,discount:25,sstRate:8}).total,6277.5);
+eq('SRO discount capped at 25%',lf({type:'sale',amount:650000,discount:40}).disc,25);
+eq('SRO Table B 300k (70% of A)',lf({type:'sale',amount:300000,hda:true}).fee,2625);
+eq('SRO Table B takes no discount',lf({type:'sale',amount:300000,hda:true,discount:20}).net,2625);
+eq('SRO minimum RM500',lf({type:'sale',amount:20000}).fee,500);
+eq('SRO loan 585k + 2 subsidiary',lf({type:'loan',amount:585000,subsidiary:2}).fee,8520);
+eq('SRO subsidiary capped at RM2,000',lf({type:'loan',amount:2000000,subsidiary:1}).fee,23250);
+eq('SRO tenancy RM2,000 rent',lf({type:'tenancy',rent:2000}).fee,600);
+eq('SRO lease RM3,000 rent',lf({type:'lease',rent:3000}).fee,1800);
+eq('SRO tenancy takes no discount',lf({type:'tenancy',rent:2000,discount:10}).net,600);
 if (process.exitCode !== 1) console.log("All tests passed.");

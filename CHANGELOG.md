@@ -1,5 +1,16 @@
 # Changelog
 
+## 11 November 2026: legal fees
+
+- New "Legal fees" tab: solicitors' scale fees under the Solicitors' Remuneration Order 2023 [P.U. (A) 207/2023], in force 15 July 2023
+  - First Schedule (sale and transfer), Tables A and B
+  - Third Schedule (charges and financing), Tables A and B, with subsidiary instruments
+  - Second Schedule (lease and tenancy), including rule 5 (50% for 10+ units or renewals)
+- Discount slider and box, 0% to 25%, applied only to Table A fees (para 6)
+- Service tax, default 8%, on the fee after discount
+- Disbursements excluded and flagged (para 3(1))
+- Quotes checked against Bar Council Circular No 185/2023, which reproduces the gazetted order
+
 ## 10 November 2026: first public release
 
 Rates and rules as at 10 November 2026. Quotes checked against:
